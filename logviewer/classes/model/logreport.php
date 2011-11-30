@@ -35,7 +35,8 @@ class Model_Logreport{
 
     protected function _createLogEntries()
     {
-        $pattern = "/(.*) --- ([A-Z]*): ([^:]*):? ([^~]*)~? (.*)/";
+        $pattern = "/(.*) --- ([A-Z]*): ([^:]*): ([^~]*)~ (.*)/";
+        $custom_log = "/(\d{4}-\d{2}-\d{2}.*) --- ([A-Z]*): (.*)/";
         
         foreach($this->_rawContent as $logRaw) {
             if (preg_match($pattern, $logRaw, $matches)) {
@@ -48,6 +49,19 @@ class Model_Logreport{
                 $log['type'] = $matches[3];     // Exception name
                 $log['message'] = $matches[4];
                 $log['file'] = $matches[5];
+
+                $this->_logEntries[] = $log;
+            }
+            else if (preg_match($custom_log, $logRaw, $matches)) {
+
+                $log = array();
+                $log['raw'] = $logRaw;
+                $log['time'] = strtotime($matches[1]);
+                $log['level'] = $matches[2];    // Notice, Error etc.
+                $log['style'] = $this->_getStyle($matches[2]);    // CSS class for styling
+                $log['message'] = $matches[3];
+                $log['type'] = '';
+                $log['file'] = '';
 
                 $this->_logEntries[] = $log;
             }
