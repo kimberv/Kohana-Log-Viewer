@@ -38,18 +38,23 @@ class Model_Logreport{
         $pattern = "/(.*) --- ([A-Z]*): ([^:]*):? ([^~]*)~? (.*)/";
         
         foreach($this->_rawContent as $logRaw) {
-            preg_match($pattern, $logRaw, $matches);
+            if (preg_match($pattern, $logRaw, $matches)) {
 
-            $log = array();
-            $log['raw'] = $logRaw;
-            $log['time'] = strtotime($matches[1]);
-            $log['level'] = $matches[2];    // Notice, Error etc.
-            $log['style'] = $this->_getStyle($matches[2]);    // CSS class for styling
-            $log['type'] = $matches[3];     // Exception name
-            $log['message'] = $matches[4];
-            $log['file'] = $matches[5];
+                $log = array();
+                $log['raw'] = $logRaw;
+                $log['time'] = strtotime($matches[1]);
+                $log['level'] = $matches[2];    // Notice, Error etc.
+                $log['style'] = $this->_getStyle($matches[2]);    // CSS class for styling
+                $log['type'] = $matches[3];     // Exception name
+                $log['message'] = $matches[4];
+                $log['file'] = $matches[5];
 
-            $this->_logEntries[] = $log;
+                $this->_logEntries[] = $log;
+            }
+            else {
+                $last = count($this->_logEntries) - 1;
+                $this->_logEntries[$last]['message'] .= $logRaw;
+            }
         }
     }
 
